@@ -1,0 +1,96 @@
+-- No 1
+
+SELECT COUNT(DISTINCT user_session) 'User Session',
+MIN (price) 'Min Price',
+MAX (price) 'Max Price',
+avg (price) 'Average'
+FROM ecommerce_event
+WHERE event_type = 'view' and brand NOT IN ('apple', 'samsung');
+
+-- No 2
+
+SELECT COUNT(DISTINCT product_id) 'total unique product'
+FROM ecommerce_event
+WHERE (brand LIKE 'a%' OR brand like 'k%') AND event_date > '2019-10-04';
+
+-- No 3
+
+SELECT event_date, COUNT(DISTINCT product_id) total_product,
+COUNT(DISTINCT user_id) total_user
+FROM ecommerce_event
+WHERE event_date > '2019-08-04'
+GROUP BY event_date
+ORDER BY event_date;
+
+-- No 4
+
+SELECT event_date, COUNT(DISTINCT product_id) total_product,
+COUNT(DISTINCT user_id) total_user
+FROM ecommerce_event
+WHERE event_date > '2019-08-04'
+GROUP BY event_date
+HAVING total_product > 500
+ORDER BY event_date;
+
+-- No 5
+
+SELECT u.gender, COUNT(DISTINCT user_session) total_session
+FROM ecommerce_event e
+INNER JOIN user_profile u
+ON e.user_id = u.user_id
+WHERE event_date BETWEEN '2019-10-01' and '2019-10-31'
+GROUP BY u.gender
+ORDER BY total_session DESC;
+
+-- No 6
+
+SELECT e.brand, u.gender, COUNT(DISTINCT e.user_id) user
+FROM ecommerce_event e
+INNER JOIN user_profile u
+ON e.user_id = u.user_id
+WHERE e.brand IN ('apple', 'samsung')
+GROUP by 1,2
+ORDER by 1,3 DESC;
+
+-- No 7
+
+SELECT u.age, COUNT(DISTINCT e.user_id) total_user,
+COUNT(DISTINCT e.product_id) total_product,
+COUNT(DISTINCT e.user_session) total_session
+FROM ecommerce_event e
+INNER JOIN user_profile u
+ON e.user_id = u.user_id
+GROUP BY 1
+HAVING total_user < 320
+ORDER BY 1;
+
+-- No 8
+
+SELECT event_date, SUM(price) daily_revenue,
+COUNT(DISTINCT user_id) user
+FROM ecommerce_event
+WHERE event_type = 'purchase'
+GROUP BY 1
+ORDER BY 1;
+
+
+-- No 9
+
+SELECT e.event_date, SUM(e.price) daily_revenue,
+COUNT(DISTINCT e.user_id) user
+FROM ecommerce_event e
+INNER JOIN user_profile u
+ON e.user_id = u.user_id
+WHERE e.event_type = 'purchase' and u.gender = 'Male'
+GROUP BY 1
+ORDER BY 1;
+
+-- No 10
+
+SELECT event_date, SUM(price) / count(DISTINCT e.user_id) 'daily avg revenue per user'
+FROM ecommerce_event e
+WHERE event_type = 'purchase'
+GROUP BY 1
+HAVING SUM(price) > 3000
+ORDER BY 1;
+
